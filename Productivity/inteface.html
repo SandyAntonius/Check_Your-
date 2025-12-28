@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Score Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div class="max-w-2xl mx-auto">
+        <!-- Main Form Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+            <div class="flex items-center gap-3 mb-4">
+                <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <h1 class="text-3xl font-bold text-gray-800">Productivity Predictor</h1>
+            </div>
+            <p class="text-gray-600 mb-6">Quick assessment of your productivity score</p>
+
+            <div id="errorMessage" class="hidden mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+                <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-red-700 text-sm" id="errorText"></span>
+            </div>
+
+            <form id="predictForm" class="space-y-6">
+                <!-- Basic Info -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                        <input type="number" name="age" value="30" min="18" max="100" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Job Type</label>
+                        <select name="job_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option>IT</option>
+                            <option>Finance</option>
+                            <option>Health</option>
+                            <option>Education</option>
+                            <option>Student</option>
+                            <option>Unemployed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Digital Habits -->
+                <div class="p-4 bg-blue-50 rounded-lg space-y-4">
+                    <h3 class="font-semibold text-gray-700">📱 Digital Habits</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Social Media Time (hours/day)</label>
+                        <input type="number" name="daily_social_media_time" value="2" step="0.5" min="0" max="18"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Daily Notifications</label>
+                        <input type="number" name="number_of_notifications" value="50" min="0" max="500"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Wellbeing -->
+                <div class="p-4 bg-green-50 rounded-lg space-y-4">
+                    <h3 class="font-semibold text-gray-700">💚 Wellbeing</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sleep Hours</label>
+                            <input type="number" name="sleep_hours" value="7" step="0.5" min="0" max="16"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Stress Level (1-10)</label>
+                            <input type="number" name="stress_level" value="5" min="1" max="10"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Burnout Days/Month</label>
+                        <input type="number" name="days_feeling_burnout_per_month" value="5" min="0" max="31"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Work Habits -->
+                <div class="p-4 bg-purple-50 rounded-lg space-y-4">
+                    <h3 class="font-semibold text-gray-700">💼 Work Habits</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Work Hours/Day</label>
+                            <input type="number" name="work_hours_per_day" value="8" step="0.5" min="0" max="24"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Job Satisfaction (1-10)</label>
+                            <input type="number" name="job_satisfaction_score" value="7" min="1" max="10"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Perceived Productivity (1-10)</label>
+                        <input type="number" name="perceived_productivity_score" value="7" min="1" max="10"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Advanced Options (Collapsible) -->
+                <details class="border border-gray-200 rounded-lg">
+                    <summary class="cursor-pointer p-4 font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                        ⚙️ Advanced Options (Optional)
+                    </summary>
+                    <div class="p-4 space-y-4 border-t">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                <select name="gender" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Social Platform</label>
+                                <select name="social_platform_preference" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                    <option>Twitter</option>
+                                    <option>Facebook</option>
+                                    <option>Instagram</option>
+                                    <option>TikTok</option>
+                                    <option>Telegram</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-700 mb-1">Screen Before Sleep (hrs)</label>
+                                <input type="number" name="screen_time_before_sleep" value="1" step="0.5" 
+                                    class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-700 mb-1">Breaks/Day</label>
+                                <input type="number" name="breaks_during_work" value="3" 
+                                    class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-700 mb-1">Coffee Cups/Day</label>
+                                <input type="number" name="coffee_consumption_per_day" value="2" 
+                                    class="w-full px-3 py-2 border rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-700 mb-1">Weekly Offline Hours</label>
+                            <input type="number" name="weekly_offline_hours" value="10" 
+                                class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="uses_focus_apps" class="w-4 h-4 text-indigo-600 rounded">
+                                <span class="text-sm text-gray-700">Use Focus Apps</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="has_digital_wellbeing_enabled" class="w-4 h-4 text-indigo-600 rounded">
+                                <span class="text-sm text-gray-700">Digital Wellbeing</span>
+                            </label>
+                        </div>
+                    </div>
+                </details>
+
+                <button type="button" id="predictBtn"
+                    class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    Predict My Productivity Score
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden bg-white rounded-2xl shadow-xl p-8 animate-fadeIn">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Your Results</h2>
+            
+            <div class="flex flex-col items-center gap-4">
+                <div class="relative w-48 h-48">
+                    <svg class="transform -rotate-90 w-48 h-48">
+                        <circle cx="96" cy="96" r="88" stroke="#e5e7eb" stroke-width="12" fill="none"/>
+                        <circle id="progressCircle" cx="96" cy="96" r="88" stroke-width="12" fill="none"
+                            stroke-dasharray="0 553" class="transition-all duration-1000"/>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="scoreValue" class="text-5xl font-bold">0</span>
+                        <span class="text-gray-600 text-sm">out of 10</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p id="scoreLabel" class="text-2xl font-semibold">Productivity</p>
+                    <p id="scoreDescription" class="text-gray-600 mt-2"></p>
+                </div>
+
+                <div class="w-full bg-gray-50 rounded-lg p-4 mt-4">
+                    <h3 class="font-semibold text-gray-700 mb-3">💡 Top Recommendations:</h3>
+                    <ul id="recommendations" class="space-y-2 text-sm text-gray-600"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('predictForm');
+        const predictBtn = document.getElementById('predictBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const resultsSection = document.getElementById('resultsSection');
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+        function getFormData() {
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (form.elements[key].type === 'number') {
+                    data[key] = parseFloat(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Handle checkboxes
+            data['uses_focus_apps'] = form.elements['uses_focus_apps'].checked;
+            data['has_digital_wellbeing_enabled'] = form.elements['has_digital_wellbeing_enabled'].checked;
+            
+            return data;
+        }
+
+        function updateResults(prediction, formData) {
+            const score = parseFloat(prediction);
+            
+            document.getElementById('scoreValue').textContent = score.toFixed(1);
+            
+            const progressCircle = document.getElementById('progressCircle');
+            const progress = (score / 10) * 553;
+            const color = score >= 8 ? '#10b981' : score >= 6 ? '#f59e0b' : '#ef4444';
+            
+            progressCircle.setAttribute('stroke', color);
+            progressCircle.setAttribute('stroke-dasharray', `${progress} 553`);
+            
+            const scoreLabel = document.getElementById('scoreLabel');
+            const scoreDescription = document.getElementById('scoreDescription');
+            
+            const label = score >= 8 ? 'Excellent' : score >= 6 ? 'Good' : score >= 4 ? 'Fair' : 'Poor';
+            scoreLabel.textContent = `${label} Productivity`;
+            scoreLabel.className = `text-2xl font-semibold ${score >= 8 ? 'text-green-600' : score >= 6 ? 'text-yellow-600' : 'text-red-600'}`;
+            
+            if (score >= 8) {
+                scoreDescription.textContent = "You're highly productive! Keep it up! 🎉";
+            } else if (score >= 6) {
+                scoreDescription.textContent = "Good productivity. Small tweaks could help! 💪";
+            } else if (score >= 4) {
+                scoreDescription.textContent = "Fair productivity. Time for some changes! 🔄";
+            } else {
+                scoreDescription.textContent = "Low productivity. Let's improve your habits! 🚀";
+            }
+            
+            const recommendations = [];
+            if (formData.daily_social_media_time > 3) {
+                recommendations.push('📱 Reduce social media to under 3 hours/day');
+            }
+            if (formData.sleep_hours < 7) {
+                recommendations.push('😴 Aim for 7-8 hours of sleep');
+            }
+            if (formData.stress_level > 6) {
+                recommendations.push('🧘 Practice stress management techniques');
+            }
+            if (formData.days_feeling_burnout_per_month > 10) {
+                recommendations.push('⚠️ Address burnout - take breaks and set boundaries');
+            }
+            if (formData.job_satisfaction_score < 5) {
+                recommendations.push('💼 Consider ways to improve job satisfaction');
+            }
+            if (formData.work_hours_per_day > 10) {
+                recommendations.push('⏰ Reduce work hours - balance is key');
+            }
+            
+            const recommendationsList = document.getElementById('recommendations');
+            if (recommendations.length > 0) {
+                recommendationsList.innerHTML = recommendations.map(r => `<li>• ${r}</li>`).join('');
+            } else {
+                recommendationsList.innerHTML = '<li>✅ Great job! Keep maintaining your healthy habits!</li>';
+            }
+            
+            resultsSection.classList.remove('hidden');
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        predictBtn.addEventListener('click', async () => {
+            hideError();
+            const formData = getFormData();
+            
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = `
+                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Analyzing...
+            `;
+            
+            try {
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateResults(data.prediction, formData);
+                } else {
+                    showError('Prediction failed: ' + data.error);
+                }
+            } catch (error) {
+                showError('Failed to connect to server. Make sure Flask is running on http://localhost:5000');
+                console.error('Error:', error);
+            }
+            
+            predictBtn.disabled = false;
+            predictBtn.innerHTML = `
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                Predict My Productivity Score
+            `;
+        });
+    </script>
+</body>
+</html>
